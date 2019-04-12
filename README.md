@@ -4,16 +4,16 @@ A social VR platform supporting VoIP and hand motion capture developed for my BS
 ## Technologies
 - [Unity](https://unity.com/ "Unity's Homepage") (game engine)
 - [Mirror](https://github.com/vis2k/Mirror "Mirror's github Repository") (Unity networking API)
-- [CaptoGlove](https://www.captoglove.com/ "CaptoGlove's Homepage") (motion capture glove)
+- [Ignorance](https://github.com/SoftwareGuy/Ignorance "Ignorance's github repository") (reliable UDP transport layer for Mirror)
 - [UniVoice](https://github.com/adrenak/UniVoice "UniVoice's github Repository") (Unity VoIP solution, modified source code to work with Mirror)
+- [Vive](https://www.vive.com "Vive's Homepage") (VR System)
+- [CaptoGlove](https://www.captoglove.com/ "CaptoGlove's Homepage") (motion capture glove)
 
 ## TODO
 
 ### Core:
-- Start positions, social distance.
 - Server only flow control.
 - VR UI.
-- Replace Telepathy networking layer with Ignorance.
 
 ### Luxury:
 - Eyes, idle animation.

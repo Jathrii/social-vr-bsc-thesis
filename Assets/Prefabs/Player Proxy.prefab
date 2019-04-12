@@ -38,7 +38,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8197873504747532766}
   - component: {fileID: 8197873504747532761}
-  - component: {fileID: 3942834659023714163}
+  - component: {fileID: 716533208538486117}
   - component: {fileID: 1626749833000855442}
   - component: {fileID: 1475815462970929095}
   - component: {fileID: 5099844500586808536}
@@ -77,11 +77,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SceneId: 0
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 1
+  serverOnly: 0
+  localPlayerAuthority: 1
   m_AssetId: 229506bee1e2c4c4ea8b3e9168b8637c
---- !u!114 &3942834659023714163
+  m_SceneId: 0
+--- !u!114 &716533208538486117
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncInterval: 0.1
-  Speaking: 0
+  speaking: 0
 --- !u!82 &5099844500586808536
 AudioSource:
   m_ObjectHideFlags: 0

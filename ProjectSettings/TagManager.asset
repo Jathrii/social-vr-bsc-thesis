@@ -20,6 +20,7 @@ TagManager:
   - projectile
   - FxTemporaire
   - speakingIndicator
+  - SteamVRPlayer
   layers:
   - Default
   - TransparentFX
