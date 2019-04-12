@@ -12,7 +12,9 @@ namespace SocialVR {
             if (!isLocalPlayer)
                 return;
 
-            //Utils.InitiateTeleportFade();
+            FlowController.startPosition = transform;
+
+            Utils.InitiateTeleportFade();
             Transform SteamVRPlayer = GameObject.FindGameObjectWithTag ("SteamVRPlayer").transform;
             SteamVRPlayer.SetPositionAndRotation (transform.position, transform.rotation);
         }
