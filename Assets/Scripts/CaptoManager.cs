@@ -42,8 +42,6 @@ namespace SocialVR {
             rHand[3] = new Finger (100, 3600, "Ring");
             rHand[4] = new Finger (100, 4000, "Pinky");
 
-            if (!isServer)
-                return;
             Debug.Log ("Start ");
             var logEntry = new CallbackLogEntry (LogLevel.Debug);
             logEntry.LogReceived += (obj, arguments) => {
@@ -107,7 +105,6 @@ namespace SocialVR {
         }
 
         private void Peripheral_StreamReceived (object sender, BoardStreamEventArgs e) {
-
             if (e.StreamType == BoardStreamType.SensorsState) {
                 var args = e as BoardFloatSequenceEventArgs;
                 var value = FloatsToString (args.Value);
@@ -154,9 +151,6 @@ namespace SocialVR {
 
         // Update is called once per frame
         void Update () {
-            if (!isServer)
-                return;
-
             if (lSensors != null) {
                 // Animate left hand fingers
                 for (int i = 0; i < 5; i++) {
@@ -175,19 +169,8 @@ namespace SocialVR {
                 }
             }
 
-            CmdAnimateHands ((lSensors != null), (rSensors != null), lLast, rLast);
-        }
-
-        [Command]
-        private void CmdSetupAnimators () {
-            RpcSetupAnimators ();
-        }
-
-        [ClientRpc]
-        private void RpcSetupAnimators () {
-            if (isLocalPlayer)
-                return;
-
+            if (lSensors != null || lSensors != null)
+                CmdAnimateHands ((lSensors != null), (rSensors != null), lLast, rLast);
         }
 
         [Command]
