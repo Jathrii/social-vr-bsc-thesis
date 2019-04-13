@@ -13,8 +13,7 @@ namespace SocialVR {
                 return;
 
             FlowController.startPosition = transform;
-
-            Utils.InitiateTeleportFade();
+            
             Transform SteamVRPlayer = GameObject.FindGameObjectWithTag ("SteamVRPlayer").transform;
             SteamVRPlayer.SetPositionAndRotation (transform.position, transform.rotation);
         }
@@ -25,13 +24,8 @@ namespace SocialVR {
                 return;
 
             Transform VRCamTransform = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ().transform;
-
-            Vector3 newPosition = VRCamTransform.position - new Vector3 (0, VRCamTransform.position.y, 0);
-
-            if ((newPosition - transform.position).magnitude > 0.01f) {
-                transform.position = newPosition;
-                transform.forward = new Vector3 (VRCamTransform.forward.x, 0, VRCamTransform.forward.z);
-            }
+            transform.position = VRCamTransform.position - new Vector3 (0, VRCamTransform.position.y, 0);
+            transform.forward = new Vector3 (VRCamTransform.forward.x, 0, VRCamTransform.forward.z);
 
             Head.transform.forward = VRCamTransform.forward;
 
