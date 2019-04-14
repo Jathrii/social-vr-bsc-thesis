@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using Valve.VR;
 
-namespace SocialVR {
-    public class TrackedObject : MonoBehaviour {
-        public enum EIndex {
+namespace SocialVR
+{
+    public class TrackedObject : MonoBehaviour
+    {
+        public enum EIndex
+        {
             None = -1,
-            Hmd = (int) OpenVR.k_unTrackedDeviceIndex_Hmd,
+            Hmd = (int)OpenVR.k_unTrackedDeviceIndex_Hmd,
             Device1,
             Device2,
             Device3,
@@ -23,7 +26,8 @@ namespace SocialVR {
             Device15
         }
 
-        public enum Hand {
+        public enum Hand
+        {
             Left = 0,
             Right = 1
         }
@@ -34,16 +38,17 @@ namespace SocialVR {
 
         private int[] trackerIndices;
 
-        [Tooltip ("If not set, relative to parent")]
+        [Tooltip("If not set, relative to parent")]
         public Transform origin;
 
         public bool isValid { get; private set; }
 
-        private void OnNewPoses (TrackedDevicePose_t[] poses) {
+        private void OnNewPoses(TrackedDevicePose_t[] poses)
+        {
             if (index == EIndex.None)
                 return;
 
-            var i = (int) index;
+            var i = (int)index;
 
             isValid = false;
             if (poses.Length <= i)
@@ -57,12 +62,15 @@ namespace SocialVR {
 
             isValid = true;
 
-            var pose = new SteamVR_Utils.RigidTransform (poses[i].mDeviceToAbsoluteTracking);
+            var pose = new SteamVR_Utils.RigidTransform(poses[i].mDeviceToAbsoluteTracking);
 
-            if (origin != null) {
-                transform.position = origin.transform.TransformPoint (pose.pos);
+            if (origin != null)
+            {
+                transform.position = origin.transform.TransformPoint(pose.pos);
                 transform.rotation = origin.rotation * pose.rot;
-            } else {
+            }
+            else
+            {
                 transform.localPosition = pose.pos;
                 transform.localRotation = pose.rot;
 
@@ -71,17 +79,21 @@ namespace SocialVR {
 
         SteamVR_Events.Action newPosesAction;
 
-        TrackedObject () {
-            newPosesAction = SteamVR_Events.NewPosesAction (OnNewPoses);
+        TrackedObject()
+        {
+            newPosesAction = SteamVR_Events.NewPosesAction(OnNewPoses);
         }
 
-        private void Awake () {
-            OnEnable ();
+        private void Awake()
+        {
+            OnEnable();
         }
 
-        void OnEnable () {
+        void OnEnable()
+        {
             var render = SteamVR_Render.instance;
-            if (render == null) {
+            if (render == null)
+            {
                 enabled = false;
                 return;
             }
@@ -89,31 +101,37 @@ namespace SocialVR {
             newPosesAction.enabled = true;
         }
 
-        void OnDisable () {
+        void OnDisable()
+        {
             newPosesAction.enabled = false;
             isValid = false;
         }
 
-        public void SetDeviceIndex (int index) {
-            if (System.Enum.IsDefined (typeof (EIndex), index))
-                this.index = (EIndex) index;
+        public void SetDeviceIndex(int index)
+        {
+            if (System.Enum.IsDefined(typeof(EIndex), index))
+                this.index = (EIndex)index;
         }
 
-        private void Start () {
+        private void Start()
+        {
             var error = ETrackedPropertyError.TrackedProp_Success;
 
             trackerIndices = new int[2];
             bool found = false;
 
-            for (int i = 0; i < 7; i++) {
-                var result = new System.Text.StringBuilder ((int) 64);
-                OpenVR.System.GetStringTrackedDeviceProperty ((uint) i, ETrackedDeviceProperty.Prop_RenderModelName_String, result, 64, ref error);
-                Debug.Log (i + ": " + result.ToString ());
+            for (int i = 0; i < 7; i++)
+            {
+                var result = new System.Text.StringBuilder((int)64);
+                OpenVR.System.GetStringTrackedDeviceProperty((uint)i, ETrackedDeviceProperty.Prop_RenderModelName_String, result, 64, ref error);
+                Debug.Log(i + ": " + result.ToString());
 
-                if (result.ToString ().Contains ("tracker")) {
+                if (result.ToString().Contains("tracker"))
+                {
                     if (found)
                         trackerIndices[1] = i;
-                    else {
+                    else
+                    {
                         trackerIndices[0] = i;
                         found = true;
                     }
@@ -121,21 +139,23 @@ namespace SocialVR {
             }
 
             if (hand == Hand.Left)
-                SetDeviceIndex (trackerIndices[0]);
+                SetDeviceIndex(trackerIndices[0]);
             else
-                SetDeviceIndex (trackerIndices[1]);
+                SetDeviceIndex(trackerIndices[1]);
         }
 
-        private void Update () {
-            if (Input.GetKeyDown (KeyCode.Tab)) {
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
                 int temp = trackerIndices[0];
                 trackerIndices[0] = trackerIndices[1];
                 trackerIndices[1] = temp;
 
                 if (hand == Hand.Left)
-                    SetDeviceIndex (trackerIndices[0]);
+                    SetDeviceIndex(trackerIndices[0]);
                 else
-                    SetDeviceIndex (trackerIndices[1]);
+                    SetDeviceIndex(trackerIndices[1]);
             }
         }
     }
