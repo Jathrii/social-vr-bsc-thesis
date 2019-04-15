@@ -9,8 +9,10 @@ namespace SocialVR
 {
     public class PlayerModelSync : NetworkBehaviour
     {
+        public GameObject Avatar;
         public GameObject Head;
-        public GameObject Chest;
+        public GameObject Eyes;
+        private Vector3 cameraOffset;
 
         private void Start()
         {
@@ -21,8 +23,11 @@ namespace SocialVR
 
             //InputTracking.disablePositionalTracking = true;
 
-            Transform SteamVRPlayer = GameObject.FindGameObjectWithTag("SteamVRPlayer").transform;
-            SteamVRPlayer.SetPositionAndRotation(transform.position, transform.rotation);
+            Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").transform;
+            VRCamTransform.position = Eyes.transform.position;
+            VRCamTransform.eulerAngles = Eyes.transform.eulerAngles;
+
+            cameraOffset = Eyes.transform.position - Avatar.transform.position;
         }
 
         // Update is called once per frame
@@ -32,28 +37,36 @@ namespace SocialVR
                 return;
 
             Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().transform;
-            transform.position = new Vector3(VRCamTransform.position.x, 0, VRCamTransform.position.z);
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, VRCamTransform.eulerAngles.y, transform.eulerAngles.z);
+            Avatar.transform.eulerAngles = new Vector3(Avatar.transform.eulerAngles.x, invertAngle(VRCamTransform.eulerAngles.y), Avatar.transform.eulerAngles.z);
             Head.transform.eulerAngles = new Vector3(-VRCamTransform.eulerAngles.x, Head.transform.eulerAngles.y, VRCamTransform.eulerAngles.z);
 
-            CmdSyncModel(transform.position, VRCamTransform.eulerAngles);
+            cameraOffset = Eyes.transform.position - Avatar.transform.position;
+
+            Avatar.transform.position = VRCamTransform.position - cameraOffset;
+
+            CmdSyncModel(Avatar.transform.position, VRCamTransform.eulerAngles);
         }
 
         [Command]
-        void CmdSyncModel(Vector3 position, Vector3 eulerAngles)
+        private void CmdSyncModel(Vector3 position, Vector3 eulerAngles)
         {
             RpcSyncModel(position, eulerAngles);
         }
 
         [ClientRpc]
-        void RpcSyncModel(Vector3 position, Vector3 eulerAngles)
+        private void RpcSyncModel(Vector3 position, Vector3 eulerAngles)
         {
             if (isLocalPlayer)
                 return;
 
-            transform.position = new Vector3(position.x, 0, position.z);
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, eulerAngles.y, transform.eulerAngles.z);
-            Head.transform.eulerAngles = eulerAngles;
+            Avatar.transform.position = position;
+            Avatar.transform.eulerAngles = new Vector3(Avatar.transform.eulerAngles.x, eulerAngles.y, Avatar.transform.eulerAngles.z);
+            Head.transform.eulerAngles = new Vector3(-eulerAngles.x, Head.transform.eulerAngles.y, eulerAngles.z);
+        }
+
+        private static float invertAngle(float angle)
+        {
+            return angle > 180f ? angle - 180f : angle + 180f;
         }
     }
 }
