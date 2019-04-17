@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1434736308397156546}
   - component: {fileID: 1434736308397156547}
   - component: {fileID: 2145379469101703373}
+  - component: {fileID: 3976236665696485247}
   m_Layer: 0
   m_Name: InfoCanvas
   m_TagString: Untagged
@@ -116,6 +117,18 @@ MonoBehaviour:
   localPlayerAuthority: 0
   m_AssetId: 88f62e269c3652a44a270a79d8c25941
   m_SceneId: 0
+--- !u!114 &3976236665696485247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1434736308397160252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be516e00d3b70494db1c644026afadfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1434736309037747979
 GameObject:
   m_ObjectHideFlags: 0
