@@ -14,6 +14,12 @@ namespace SocialVR
         public GameObject Eyes;
         private Vector3 cameraOffset;
 
+        [SyncVar]
+        private Vector3 VRCamPosition;
+
+        [SyncVar]
+        private Vector3 VRCamEulerAngles;
+
         private void Start()
         {
             if (!isLocalPlayer)
@@ -23,34 +29,42 @@ namespace SocialVR
 
             //InputTracking.disablePositionalTracking = true;
 
+            Transform VRPlayerTransform = GameObject.FindGameObjectWithTag("SteamVRPlayer").transform;
+            VRPlayerTransform.position = new Vector3(transform.position.x, VRPlayerTransform.position.y, transform.position.z);
+            VRPlayerTransform.eulerAngles = transform.eulerAngles;
+
             Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").transform;
             VRCamTransform.position = Eyes.transform.position;
             VRCamTransform.eulerAngles = Eyes.transform.eulerAngles;
-
-            cameraOffset = Eyes.transform.position - Avatar.transform.position;
         }
 
         // Update is called once per frame
         private void Update()
         {
-            if (!isLocalPlayer)
-                return;
+            if (isLocalPlayer)
+            {
+                Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().transform;
+                SyncModel(VRCamTransform.position, VRCamTransform.eulerAngles);
+            }
 
-            Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().transform;
-            Avatar.transform.eulerAngles = new Vector3(Avatar.transform.eulerAngles.x, invertAngle(VRCamTransform.eulerAngles.y), Avatar.transform.eulerAngles.z);
-            Head.transform.eulerAngles = new Vector3(-VRCamTransform.eulerAngles.x, Head.transform.eulerAngles.y, VRCamTransform.eulerAngles.z);
+            Avatar.transform.eulerAngles = new Vector3(Avatar.transform.eulerAngles.x, invertAngle(VRCamEulerAngles.y), Avatar.transform.eulerAngles.z);
+            Head.transform.eulerAngles = new Vector3(-VRCamEulerAngles.x, Head.transform.eulerAngles.y, VRCamEulerAngles.z);
 
             cameraOffset = Eyes.transform.position - Avatar.transform.position;
 
-            Avatar.transform.position = VRCamTransform.position - cameraOffset;
+            Avatar.transform.position = VRCamPosition - cameraOffset;
+        }
 
-            CmdSyncModel(Avatar.transform.position, VRCamTransform.eulerAngles);
+        private void SyncModel(Vector3 position, Vector3 eulerAngles)
+        {
+            CmdSyncModel(position, eulerAngles);
         }
 
         [Command]
-        private void CmdSyncModel(Vector3 position, Vector3 eulerAngles)
+        void CmdSyncModel(Vector3 position, Vector3 eulerAngles)
         {
-            RpcSyncModel(position, eulerAngles);
+            VRCamPosition = position;
+            VRCamEulerAngles = eulerAngles;
         }
 
         [ClientRpc]

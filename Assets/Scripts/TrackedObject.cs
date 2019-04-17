@@ -73,7 +73,6 @@ namespace SocialVR
             {
                 transform.localPosition = pose.pos;
                 transform.localRotation = pose.rot;
-
             }
         }
 
@@ -115,6 +114,9 @@ namespace SocialVR
 
         private void Start()
         {
+            if (!SteamVR.active)
+                return;
+
             var error = ETrackedPropertyError.TrackedProp_Success;
 
             trackerIndices = new int[2];

@@ -115,6 +115,34 @@ namespace SocialVR
         [Command]
         private void CmdSendAudioSegment(byte[] payload)
         {
+            var reader = new UniStreamReader(payload);
+            var index = reader.ReadInt();
+            var segment = reader.ReadFloatArray();
+
+            // If the streamer is getting filled, request for a packet skip
+            if (streamer)
+                streamer.Stream(index, segment);
+            else if (channels > 0)
+            {
+                var segLen = k_MicFrequency / 1000 * k_MicSegLenMS;
+                var segCap = 1000 / k_MicSegLenMS;
+
+                // Create an AudioBuffer using the Mic values
+                AudioBuffer buffer = new AudioBuffer(
+                    k_MicFrequency,
+                    channels,
+                    segLen,
+                    segCap
+                );
+
+                AudioSource source = GetComponent<AudioSource>();
+
+                // Use the buffer to create a streamer
+                streamer = AudioStreamerComponent.New(gameObject, buffer, source);
+
+                streamer.Stream(index, segment);
+            }
+            
             RpcSendAudioSegment(payload);
         }
 

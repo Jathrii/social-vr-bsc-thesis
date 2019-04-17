@@ -8,6 +8,8 @@ namespace SocialVR
 {
     public class CaptoManager : NetworkBehaviour
     {
+        public GameObject lHand;
+        public GameObject rHand;
         private IPeripheralCentral Central;
         private IBoardPeripheral lPeripheral;
         private IBoardPeripheral rPeripheral;
@@ -17,8 +19,8 @@ namespace SocialVR
         private float[] lLast;
         private float[] rLast;
 
-        private Finger[] lHand;
-        private Finger[] rHand;
+        private Finger[] lFingers;
+        private Finger[] rFingers;
 
         private Animator lHandAnimator;
 
@@ -27,23 +29,24 @@ namespace SocialVR
         // Use this for initialization
         void Start()
         {
-            lHandAnimator = GameObject.FindGameObjectWithTag("lHand").GetComponent<Animator>();
-            rHandAnimator = GameObject.FindGameObjectWithTag("rHand").GetComponent<Animator>();
 
-            lHand = new Finger[5];
-            rHand = new Finger[5];
+            lFingers = new Finger[5];
+            rFingers = new Finger[5];
 
-            lHand[4] = new Finger(250, 3000, "Thumb");
-            lHand[3] = new Finger(150, 2300, "Index");
-            lHand[2] = new Finger(150, 2800, "Mid");
-            lHand[1] = new Finger(200, 2200, "Ring");
-            lHand[0] = new Finger(250, 2200, "Pinky");
+            lFingers[4] = new Finger(250, 3000, "Thumb");
+            lFingers[3] = new Finger(150, 2300, "Index");
+            lFingers[2] = new Finger(150, 2800, "Mid");
+            lFingers[1] = new Finger(200, 2200, "Ring");
+            lFingers[0] = new Finger(250, 2200, "Pinky");
 
-            rHand[0] = new Finger(500, 2800, "Thumb");
-            rHand[1] = new Finger(600, 3600, "Index");
-            rHand[2] = new Finger(150, 4000, "Mid");
-            rHand[3] = new Finger(100, 3600, "Ring");
-            rHand[4] = new Finger(100, 4000, "Pinky");
+            rFingers[0] = new Finger(500, 2800, "Thumb");
+            rFingers[1] = new Finger(600, 3600, "Index");
+            rFingers[2] = new Finger(150, 4000, "Mid");
+            rFingers[3] = new Finger(100, 3600, "Ring");
+            rFingers[4] = new Finger(100, 4000, "Pinky");
+
+            if (!isLocalPlayer)
+                return;
 
             Debug.Log("Start ");
             var logEntry = new CallbackLogEntry(LogLevel.Debug);
@@ -57,15 +60,10 @@ namespace SocialVR
             Central = boardFactory.MakeBoardCentral();
             Central.PeripheralsChanged += Central_PeripheralsChanged;
             Central.StartScan(new ScanOptions() { PreferredInterval = 5 });
-
-            lLast = new float[10];
-            rLast = new float[10];
         }
 
         private void Central_PeripheralsChanged(object sender, PeripheralsEventArgs e)
         {
-            Debug.Log(e.Inserted.Length);
-
             foreach (var peripheral in e.Inserted)
             {
                 try
@@ -179,35 +177,70 @@ namespace SocialVR
         // Update is called once per frame
         void Update()
         {
-            if (lSensors != null)
+            if (isLocalPlayer)
             {
-                // Animate left hand fingers
-                for (int i = 0; i < 5; i++)
+                if (lSensors != null)
                 {
-                    if (Mathf.Abs(lSensors[i * 2 + 1] - lLast[i * 2 + 1]) > 100)
-                        lLast[i * 2 + 1] = lSensors[i * 2 + 1];
-                    lHandAnimator.Play(lHand[i].getAnimationState(), -1, lHand[i].evaluate(lLast[i * 2 + 1]));
+                    if (lLast == null)
+                        lLast = new float[10];
+
+                    // Animate left hand fingers
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (Mathf.Abs(lSensors[i * 2 + 1] - lLast[i * 2 + 1]) > 100)
+                            lLast[i * 2 + 1] = lSensors[i * 2 + 1];
+                    }
                 }
+
+                if (rSensors != null)
+                {
+                    if (rLast == null)
+                        rLast = new float[10];
+                    
+                    // Animate right hand fingers
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (Mathf.Abs(rSensors[i * 2] - rLast[i * 2]) > 100)
+                            rLast[i * 2] = rSensors[i * 2];
+                    }
+                }
+
+                if (lSensors != null || lSensors != null)
+                    CmdAnimateHands((lSensors != null), (rSensors != null), lLast, rLast);
             }
 
-            if (rSensors != null)
+            if (lLast != null)
             {
-                // Animate right hand fingers
-                for (int i = 0; i < 5; i++)
+                if (!lHand.activeSelf)
                 {
-                    if (Mathf.Abs(rSensors[i * 2] - rLast[i * 2]) > 100)
-                        rLast[i * 2] = rSensors[i * 2];
-                    rHandAnimator.Play(rHand[i].getAnimationState(), -1, rHand[i].evaluate(rLast[i * 2]));
+                    lHand.SetActive(true);
+                    lHandAnimator = lHand.GetComponent<Animator>();
                 }
+
+                Debug.Log("Wassup");
+
+                for (int i = 0; i < 5; i++)
+                    lHandAnimator.Play(lFingers[i].getAnimationState(), -1, lFingers[i].evaluate(lLast[i * 2 + 1]));
             }
 
-            if (lSensors != null || lSensors != null)
-                CmdAnimateHands((lSensors != null), (rSensors != null), lLast, rLast);
+            if (rLast != null)
+            {
+                if (!rHand.activeSelf)
+                {
+                    rHand.SetActive(true);
+                    rHandAnimator = rHand.GetComponent<Animator>();
+                }
+
+                for (int i = 0; i < 5; i++)
+                    rHandAnimator.Play(rFingers[i].getAnimationState(), -1, rFingers[i].evaluate(rLast[i * 2]));
+            }
         }
 
         [Command]
         private void CmdAnimateHands(bool left, bool right, float[] lValues, float[] rValues)
         {
+            lLast = lValues;
+            rLast = rValues;
             RpcAnimateHands(left, right, lValues, rValues);
         }
 
@@ -217,15 +250,8 @@ namespace SocialVR
             if (isLocalPlayer)
                 return;
 
-            for (int i = 0; i < 5 && left; i++)
-            {
-                lHandAnimator.Play(lHand[i].getAnimationState(), -1, lHand[i].evaluate(lValues[i * 2 + 1]));
-            }
-
-            for (int i = 0; i < 5 && right; i++)
-            {
-                rHandAnimator.Play(rHand[i].getAnimationState(), -1, rHand[i].evaluate(rValues[i * 2]));
-            }
+            lLast = lValues;
+            rLast = rValues;
         }
 
         private void OnDestroy()
