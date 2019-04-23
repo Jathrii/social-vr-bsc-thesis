@@ -217,8 +217,6 @@ namespace SocialVR
                     lHandAnimator = lHand.GetComponent<Animator>();
                 }
 
-                Debug.Log("Wassup");
-
                 for (int i = 0; i < 5; i++)
                     lHandAnimator.Play(lFingers[i].getAnimationState(), -1, lFingers[i].evaluate(lLast[i * 2 + 1]));
             }

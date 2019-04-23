@@ -126,7 +126,6 @@ namespace SocialVR
             {
                 var result = new System.Text.StringBuilder((int)64);
                 OpenVR.System.GetStringTrackedDeviceProperty((uint)i, ETrackedDeviceProperty.Prop_RenderModelName_String, result, 64, ref error);
-                Debug.Log(i + ": " + result.ToString());
 
                 if (result.ToString().Contains("tracker"))
                 {
