@@ -56,7 +56,7 @@ namespace SocialVR
             speaking = true;
 
             // Find speakingIndicator
-            speakingIndicator = GameObject.FindGameObjectWithTag("speakingIndicator").GetComponent<Text>();
+            //speakingIndicator = GameObject.FindGameObjectWithTag("speakingIndicator").GetComponent<Text>();
 
             CmdSetChannels(Mic.Clip.channels);
         }
@@ -69,6 +69,7 @@ namespace SocialVR
             if (Input.GetKeyDown(KeyCode.M))
                 speaking = !speaking;
 
+            /*
             if (speakingIndicator)
             {
                 if (speaking)
@@ -76,6 +77,7 @@ namespace SocialVR
                 else
                     speakingIndicator.text = "Muted";
             }
+            */
         }
 
         private void OnSampleReady(int index, float[] segment)

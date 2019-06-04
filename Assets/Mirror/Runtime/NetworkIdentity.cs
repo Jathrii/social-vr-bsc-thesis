@@ -40,6 +40,8 @@ namespace Mirror
         public bool hasAuthority { get; private set; }
 
         // <connectionId, NetworkConnection>
+        // null until OnStartServer was called. this is necessary for SendTo...
+        // to work properly in server-only mode.
         public Dictionary<int, NetworkConnection> observers;
 
         public uint netId { get; internal set; }
@@ -315,7 +317,7 @@ namespace Mirror
                 if (!duplicate)
                 {
                     m_SceneId = randomId;
-                    Debug.Log(name + " in scene=" + gameObject.scene.name + " sceneId assigned to: " + m_SceneId.ToString("X"));
+                    //Debug.Log(name + " in scene=" + gameObject.scene.name + " sceneId assigned to: " + m_SceneId.ToString("X"));
                 }
             }
 
@@ -899,7 +901,7 @@ namespace Mirror
 
             if (changed)
             {
-                observers = 
+                observers =
                     newObservers.
                     Where(conn => conn.isReady).
                     ToDictionary(conn => conn.connectionId, conn => conn);

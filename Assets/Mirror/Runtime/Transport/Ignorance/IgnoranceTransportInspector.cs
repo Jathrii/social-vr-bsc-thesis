@@ -1,4 +1,4 @@
-﻿// ----------------------------------------
+// ----------------------------------------
 // Ignorance Transport by Matt Coburn, 2018 - 2019
 // This Transport uses other dependencies that you can
 // find references to in the README.md of this package.
@@ -23,7 +23,7 @@ namespace Mirror
     {
         bool showGeneralSettings = true;
         bool showServerSettings = true;
-        // bool showExperimentalSettings = false;
+        bool showUPnPSettings = false;
         bool showTimeoutSettings = false;
 
         public override void OnInspectorGUI()
@@ -42,6 +42,7 @@ namespace Mirror
 
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_TransportVerbosity"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_UseLZ4Compression"));
+                EditorGUILayout.HelpBox("There has been some reports of LZ4 compression causing random disconnections after X seconds of successful connection to the server. Please file a bug if you are affected.", MessageType.Warning);
 
                 EditorGUI.indentLevel -= 1;
             }
@@ -74,16 +75,30 @@ namespace Mirror
             }
 
             // Experimental Settings
-            /*
-            showExperimentalSettings = EditorGUILayout.Foldout(showExperimentalSettings, "Experimental Settings");
-            if (showExperimentalSettings)
+            showUPnPSettings = EditorGUILayout.Foldout(showUPnPSettings, "Universal PnP (Port Forwarding) Settings");
+#if IGNORANCE_NO_UPNP
+            if (showUPnPSettings)
             {
                 EditorGUI.indentLevel += 1;
-
+                EditorGUILayout.HelpBox("Ignorance UPnP Code has been disabled due a symbol definition. Remove IGNORANCE_NO_UPNP from Build Settings to enable UPnP code.", MessageType.Info);
                 EditorGUI.indentLevel -= 1;
             }
-            */
-
+#else
+            if (showUPnPSettings)
+            {
+                EditorGUI.indentLevel += 1;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ServerUPNPEnabled"));
+                EditorGUILayout.HelpBox("Some routers are annoying and require an IP Address of the system requesting the UPnP rule to be added. " +
+                    "Majority of the time though, leave it blank and see what happens. If you get an error, you'll have to fill the IP address in. And if you still get an error after that, your router sucks. " +
+                    "Try opening a Ignorance bug ticket and report its make and model.", MessageType.Warning);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ServerUPNPIpAddress"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ServerUPNPMappingDescription"));
+                EditorGUILayout.HelpBox("Keep the description short. Depending on your router, it might chop off text after so many characters. Avoid non-english characters for best results.", MessageType.Info);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ServerUPNPTimeout"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ServerUPNPRuleLifetime"));
+                EditorGUI.indentLevel -= 1;
+            }
+#endif
             // Apply.
             serializedObject.ApplyModifiedProperties();
         }
@@ -105,8 +120,8 @@ namespace Mirror
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox("It is recommended to leave the first two channels as Reliable and Unreliable, as this matches what Unity LLAPI was originally. " +
-                        "You can add up to 255 channels in total.", MessageType.Info);
+                    EditorGUILayout.HelpBox("You must leave the first two channels as Reliable and Unreliable, as this matches what Unity LLAPI was originally. " +
+                        "You can add up to 255 channels.", MessageType.Info);
                     for (int i = 0; i < victim.arraySize; i++)
                     {
                         EditorGUILayout.BeginHorizontal();

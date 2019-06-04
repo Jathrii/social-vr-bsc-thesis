@@ -13,7 +13,6 @@ namespace SocialVR
         {
             this.sensorMin = sensorMin;
             this.sensorMax = sensorMax;
-            //this.curve = AnimationCurve.Linear(Mathf.Log10(sensorMin + 0.0000001f), 0, Mathf.Log10(sensorMax), 0.9999999f);
             this.curve = AnimationCurve.Linear(sensorMin, 0, sensorMax, 0.9999999f);
             this.animationState = animationState;
         }

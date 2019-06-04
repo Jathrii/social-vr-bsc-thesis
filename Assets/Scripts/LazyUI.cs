@@ -6,7 +6,6 @@ namespace SocialVR
 {
     public class LazyUI : MonoBehaviour
     {
-        private bool done = true;
         private void Start()
         {
             Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().transform;
@@ -21,20 +20,11 @@ namespace SocialVR
             Transform VRCamTransform = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().transform;
 
 
-            if (Vector3.Angle(VRCamTransform.forward, transform.forward) > 30.0f && done)
+            if (Vector3.Angle(VRCamTransform.forward, transform.forward) > 30.0f)
             {
-                done = false;
                 float angle = VRCamTransform.eulerAngles.y - transform.eulerAngles.y;
                 StartCoroutine(RotateObject(FlowController.startPosition.position, Vector3.up, angle, 0.5f));
             }
-
-            /*if (done)
-            {
-                Debug.Log(VRCamTransform.forward.x + " " + VRCamTransform.forward.y + " " + VRCamTransform.forward.z);
-                Debug.Log(transform.forward.x + " " + transform.forward.y + " " + transform.forward.z);
-
-                done = false;
-            }*/
         }
 
         private IEnumerator RotateObject(Vector3 point, Vector3 axis, float rotateAmount, float rotateTime)
@@ -63,8 +53,6 @@ namespace SocialVR
                 transform.position = point + endPos;
                 transform.rotation = startRot * rotation;
             }
-
-            done = true;
 
             yield return null;
         }

@@ -10,6 +10,9 @@ namespace SocialVR
     {
         public GameObject lHand;
         public GameObject rHand;
+
+        public static bool mainPlayer = false;
+
         private IPeripheralCentral Central;
         private IBoardPeripheral lPeripheral;
         private IBoardPeripheral rPeripheral;
@@ -34,16 +37,16 @@ namespace SocialVR
             rFingers = new Finger[5];
 
             lFingers[4] = new Finger(250, 3000, "Thumb");
-            lFingers[3] = new Finger(150, 2300, "Index");
-            lFingers[2] = new Finger(150, 2800, "Mid");
-            lFingers[1] = new Finger(200, 2200, "Ring");
-            lFingers[0] = new Finger(250, 2200, "Pinky");
+            lFingers[3] = new Finger(150, 1000, "Index");
+            lFingers[2] = new Finger(150, 1000, "Mid");
+            lFingers[1] = new Finger(200, 1000, "Ring");
+            lFingers[0] = new Finger(250, 1000, "Pinky");
 
             rFingers[0] = new Finger(500, 2800, "Thumb");
-            rFingers[1] = new Finger(600, 3600, "Index");
-            rFingers[2] = new Finger(150, 4000, "Mid");
-            rFingers[3] = new Finger(100, 3600, "Ring");
-            rFingers[4] = new Finger(100, 4000, "Pinky");
+            rFingers[1] = new Finger(250, 1000, "Index");
+            rFingers[2] = new Finger(150, 1000, "Mid");
+            rFingers[3] = new Finger(100, 1000, "Ring");
+            rFingers[4] = new Finger(100, 1000, "Pinky");
 
             if (!isLocalPlayer)
                 return;
@@ -179,6 +182,8 @@ namespace SocialVR
         {
             if (isLocalPlayer)
             {
+                mainPlayer = lHand.activeSelf || rHand.activeSelf;
+
                 if (lSensors != null)
                 {
                     if (lLast == null)
@@ -214,6 +219,13 @@ namespace SocialVR
                 if (!lHand.activeSelf)
                 {
                     lHand.SetActive(true);
+
+                    if (isLocalPlayer)
+                    {
+                        TrackedObject lTracked = lHand.AddComponent<TrackedObject>();
+                        lTracked.hand = TrackedObject.Hand.Left;
+                    }
+                    
                     lHandAnimator = lHand.GetComponent<Animator>();
                 }
 
@@ -226,12 +238,20 @@ namespace SocialVR
                 if (!rHand.activeSelf)
                 {
                     rHand.SetActive(true);
+
+                    if (isLocalPlayer)
+                    {
+                        TrackedObject rTracked = rHand.AddComponent<TrackedObject>();
+                        rTracked.hand = TrackedObject.Hand.Right;
+                    }
+
                     rHandAnimator = rHand.GetComponent<Animator>();
                 }
 
                 for (int i = 0; i < 5; i++)
                     rHandAnimator.Play(rFingers[i].getAnimationState(), -1, rFingers[i].evaluate(rLast[i * 2]));
             }
+
         }
 
         [Command]
